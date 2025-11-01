@@ -3,14 +3,21 @@ import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import Card from '../ui/Card';
 import Avatar from '../ui/Avatar';
-import { mockActivities } from '../../data/mockData';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 
 const ActivityFeed: React.FC = () => {
+  const [activities] = useLocalStorage('activities', []);
+
   return (
     <Card className="p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-6">Recent Activity</h3>
       <div className="space-y-4">
-        {mockActivities.map((activity, index) => (
+        {activities.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <p>No recent activity</p>
+          </div>
+        ) : (
+          activities.map((activity: any, index: number) => (
           <motion.div
             key={activity.id}
             initial={{ opacity: 0, x: -20 }}
@@ -33,7 +40,8 @@ const ActivityFeed: React.FC = () => {
               </p>
             </div>
           </motion.div>
-        ))}
+        ))
+        )}
       </div>
       <button className="w-full mt-4 py-2 text-sm text-primary-600 hover:text-primary-700 font-medium">
         View all activity

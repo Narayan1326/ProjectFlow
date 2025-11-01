@@ -9,13 +9,17 @@ import {
 import StatsCard from './StatsCard';
 import ProjectCard from './ProjectCard';
 import ActivityFeed from './ActivityFeed';
-import { mockProjects, mockTasks } from '../../data/mockData';
+interface DashboardProps {
+  projects: any[];
+  tasks: any[];
+  user: any;
+}
 
-const Dashboard: React.FC = () => {
-  const activeProjects = mockProjects.filter(p => p.status === 'active').length;
-  const totalTasks = mockTasks.length;
-  const completedTasks = mockTasks.filter(t => t.status === 'completed').length;
-  const teamMembers = 12; // Mock data
+const Dashboard: React.FC<DashboardProps> = ({ projects, tasks, user }) => {
+  const activeProjects = projects.filter(p => p.status === 'active').length;
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(t => t.status === 'completed').length;
+  const teamMembers = 1;
 
   const container = {
     hidden: { opacity: 0 },
@@ -94,11 +98,17 @@ const Dashboard: React.FC = () => {
             animate="show"
             className="grid grid-cols-1 md:grid-cols-2 gap-4"
           >
-            {mockProjects.slice(0, 4).map((project) => (
+            {projects.length === 0 ? (
+              <div className="col-span-2 text-center py-12 text-gray-500">
+                <p>No projects yet. Create your first project to get started!</p>
+              </div>
+            ) : (
+              projects.slice(0, 4).map((project) => (
               <motion.div key={project.id} variants={item}>
                 <ProjectCard project={project} />
               </motion.div>
-            ))}
+            ))
+            )}
           </motion.div>
         </div>
 

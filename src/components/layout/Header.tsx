@@ -5,20 +5,21 @@ import Avatar from '../ui/Avatar';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
 import ThemeToggle from '../ui/ThemeToggle';
-import { mockNotifications, mockUsers } from '../../data/mockData';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 
 interface HeaderProps {
+  user: any;
   onNewProject: () => void;
   onNewTask: () => void;
   onLogout: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onNewProject, onNewTask, onLogout }) => {
+const Header: React.FC<HeaderProps> = ({ user, onNewProject, onNewTask, onLogout }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNewMenu, setShowNewMenu] = useState(false);
-  const currentUser = mockUsers[0];
-  const unreadCount = mockNotifications.filter(n => !n.read).length;
+  const [notifications, setNotifications] = useLocalStorage('notifications', []);
+  const unreadCount = notifications.filter((n: any) => !n.read).length;
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
@@ -29,7 +30,7 @@ const Header: React.FC<HeaderProps> = ({ onNewProject, onNewTask, onLogout }) =>
             animate={{ opacity: 1, y: 0 }}
             className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent"
           >
-            Good morning, Sarah! ✨
+            Good morning, {user?.name?.split(' ')[0] || 'User'}!
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: -10 }}
@@ -141,7 +142,12 @@ const Header: React.FC<HeaderProps> = ({ onNewProject, onNewTask, onLogout }) =>
                     </h3>
                   </div>
                   <div className="max-h-96 overflow-y-auto">
-                    {mockNotifications.map((notification) => (
+                    {notifications.length === 0 ? (
+                      <div className="p-8 text-center text-gray-500">
+                        No notifications yet
+                      </div>
+                    ) : (
+                      notifications.map((notification: any) => (
                       <div
                         key={notification.id}
                         className={`p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer ${
@@ -165,7 +171,8 @@ const Header: React.FC<HeaderProps> = ({ onNewProject, onNewTask, onLogout }) =>
                           )}
                         </div>
                       </div>
-                    ))}
+                    ))
+                    )}
                   </div>
                 </motion.div>
                 </>
@@ -182,12 +189,12 @@ const Header: React.FC<HeaderProps> = ({ onNewProject, onNewTask, onLogout }) =>
               className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-xl transition-all duration-200 hover:shadow-md"
             >
               <div className="relative">
-                <Avatar src={currentUser.avatar} alt={currentUser.name} size="md" />
+                <Avatar src={user?.avatar} alt={user?.name} size="md" />
                 <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-accent-500 border-2 border-white rounded-full"></div>
               </div>
               <div className="text-left">
-                <p className="text-sm font-medium text-gray-900">{currentUser.name}</p>
-                <p className="text-xs text-gray-600 capitalize">{currentUser.role}</p>
+                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                <p className="text-xs text-gray-600 capitalize">{user?.role}</p>
               </div>
               <motion.div
                 animate={{ rotate: showUserMenu ? 180 : 0 }}

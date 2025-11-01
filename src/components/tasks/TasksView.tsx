@@ -4,15 +4,20 @@ import { Plus, Search, Filter, Kanban, List } from 'lucide-react';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import TaskCard from './TaskCard';
-import { mockTasks } from '../../data/mockData';
 import { Task } from '../../types';
 
-const TasksView: React.FC = () => {
+interface TasksViewProps {
+  tasks: any[];
+  onNewTask: () => void;
+  users: any[];
+}
+
+const TasksView: React.FC<TasksViewProps> = ({ tasks, onNewTask, users }) => {
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterPriority, setFilterPriority] = useState<string>('all');
 
-  const filteredTasks = mockTasks.filter(task => {
+  const filteredTasks = tasks.filter(task => {
     const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          task.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterPriority === 'all' || task.priority === filterPriority;
@@ -84,7 +89,7 @@ const TasksView: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">Tasks</h1>
           <p className="text-gray-600">Manage and track all your tasks</p>
         </div>
-        <Button icon={Plus} size="md">
+        <Button icon={Plus} size="md" onClick={onNewTask}>
           New Task
         </Button>
       </div>

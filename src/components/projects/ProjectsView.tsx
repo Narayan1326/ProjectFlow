@@ -4,14 +4,17 @@ import { Plus, Search, Filter, Grid2x2 as Grid, List } from 'lucide-react';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import ProjectCard from '../dashboard/ProjectCard';
-import { mockProjects } from '../../data/mockData';
+interface ProjectsViewProps {
+  projects: any[];
+  onNewProject: () => void;
+}
 
-const ProjectsView: React.FC = () => {
+const ProjectsView: React.FC<ProjectsViewProps> = ({ projects, onNewProject }) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
-  const filteredProjects = mockProjects.filter(project => {
+  const filteredProjects = projects.filter(project => {
     const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          project.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === 'all' || project.status === filterStatus;
@@ -26,7 +29,7 @@ const ProjectsView: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
           <p className="text-gray-600">Manage and track all your projects</p>
         </div>
-        <Button icon={Plus} size="md">
+        <Button icon={Plus} size="md" onClick={onNewProject}>
           New Project
         </Button>
       </div>

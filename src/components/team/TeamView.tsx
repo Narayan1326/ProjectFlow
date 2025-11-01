@@ -6,18 +6,17 @@ import Avatar from '../ui/Avatar';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
 import BackButton from '../ui/BackButton';
-import { mockUsers } from '../../data/mockData';
 import { TeamMember } from '../../types';
 
 interface TeamViewProps {
   onBack: () => void;
+  users: any[];
 }
 
-const TeamView: React.FC<TeamViewProps> = ({ onBack }) => {
+const TeamView: React.FC<TeamViewProps> = ({ onBack, users }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Mock team data with extended information
-  const teamMembers: TeamMember[] = mockUsers.map(user => ({
+  const teamMembers: TeamMember[] = users.map((user: any) => ({
     ...user,
     joinedAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000),
     lastActive: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),

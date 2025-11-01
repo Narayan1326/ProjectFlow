@@ -3,33 +3,33 @@ import { motion } from 'framer-motion';
 import { BarChart3, TrendingUp, Users, Clock, Target, Award } from 'lucide-react';
 import Card from '../ui/Card';
 import BackButton from '../ui/BackButton';
-import { mockProjects, mockTasks, mockUsers } from '../../data/mockData';
-
 interface AnalyticsViewProps {
   onBack: () => void;
+  projects: any[];
+  tasks: any[];
+  users: any[];
 }
 
-const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
-  // Calculate analytics data
-  const totalProjects = mockProjects.length;
-  const activeProjects = mockProjects.filter(p => p.status === 'active').length;
-  const completedTasks = mockTasks.filter(t => t.status === 'completed').length;
-  const totalTasks = mockTasks.length;
-  const completionRate = Math.round((completedTasks / totalTasks) * 100);
-  const teamSize = mockUsers.length;
+const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack, projects, tasks, users }) => {
+  const totalProjects = projects.length;
+  const activeProjects = projects.filter(p => p.status === 'active').length;
+  const completedTasks = tasks.filter(t => t.status === 'completed').length;
+  const totalTasks = tasks.length;
+  const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  const teamSize = users.length;
 
   const projectStatusData = [
-    { status: 'Active', count: mockProjects.filter(p => p.status === 'active').length, color: '#10b981' },
-    { status: 'Planning', count: mockProjects.filter(p => p.status === 'planning').length, color: '#3b82f6' },
-    { status: 'On Hold', count: mockProjects.filter(p => p.status === 'on-hold').length, color: '#f59e0b' },
-    { status: 'Completed', count: mockProjects.filter(p => p.status === 'completed').length, color: '#8b5cf6' },
+    { status: 'Active', count: projects.filter(p => p.status === 'active').length, color: '#10b981' },
+    { status: 'Planning', count: projects.filter(p => p.status === 'planning').length, color: '#3b82f6' },
+    { status: 'On Hold', count: projects.filter(p => p.status === 'on-hold').length, color: '#f59e0b' },
+    { status: 'Completed', count: projects.filter(p => p.status === 'completed').length, color: '#8b5cf6' },
   ];
 
   const taskPriorityData = [
-    { priority: 'Urgent', count: mockTasks.filter(t => t.priority === 'urgent').length, color: '#ef4444' },
-    { priority: 'High', count: mockTasks.filter(t => t.priority === 'high').length, color: '#f59e0b' },
-    { priority: 'Medium', count: mockTasks.filter(t => t.priority === 'medium').length, color: '#3b82f6' },
-    { priority: 'Low', count: mockTasks.filter(t => t.priority === 'low').length, color: '#10b981' },
+    { priority: 'Urgent', count: tasks.filter(t => t.priority === 'urgent').length, color: '#ef4444' },
+    { priority: 'High', count: tasks.filter(t => t.priority === 'high').length, color: '#f59e0b' },
+    { priority: 'Medium', count: tasks.filter(t => t.priority === 'medium').length, color: '#3b82f6' },
+    { priority: 'Low', count: tasks.filter(t => t.priority === 'low').length, color: '#10b981' },
   ];
 
   const StatCard: React.FC<{
@@ -154,7 +154,12 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
         <Card className="p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Project Progress</h3>
           <div className="space-y-4">
-            {mockProjects.slice(0, 3).map((project, index) => (
+            {projects.length === 0 ? (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                No projects yet
+              </div>
+            ) : (
+              projects.slice(0, 3).map((project, index) => (
               <motion.div
                 key={project.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -180,14 +185,20 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
                   />
                 </div>
               </motion.div>
-            ))}
+            ))
+            )}
           </div>
         </Card>
 
         <Card className="p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Team Performance</h3>
           <div className="space-y-4">
-            {mockUsers.slice(0, 4).map((user, index) => (
+            {users.length === 0 ? (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                No team members yet
+              </div>
+            ) : (
+              users.slice(0, 4).map((user: any, index: number) => (
               <motion.div
                 key={user.id}
                 initial={{ opacity: 0, x: 20 }}
@@ -210,7 +221,8 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
                   {Math.floor(Math.random() * 30) + 70}%
                 </div>
               </motion.div>
-            ))}
+            ))
+            )}
           </div>
         </Card>
 

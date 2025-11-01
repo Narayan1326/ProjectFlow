@@ -13,15 +13,18 @@ import AnalyticsView from './components/analytics/AnalyticsView';
 import SettingsView from './components/settings/SettingsView';
 import NewProjectModal from './components/modals/NewProjectModal';
 import NewTaskModal from './components/modals/NewTaskModal';
+import NewEventModal from './components/modals/NewEventModal';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { Project, Task } from './types';
-import { mockProjects, mockTasks, mockUsers } from './data/mockData';
+import { mockUsers } from './data/mockData';
 
 const AppContent: React.FC = () => {
   const [user, setUser] = useLocalStorage('auth_user', null);
   const [users, setUsers] = useLocalStorage('registered_users', []);
-  const [projects, setProjects] = useLocalStorage<Project[]>('projects', mockProjects);
-  const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', mockTasks);
+  const [projects, setProjects] = useLocalStorage<Project[]>('projects', []);
+  const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', []);
+  const [events, setEvents] = useLocalStorage('calendar_events', []);
+  const [showNewEventModal, setShowNewEventModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
@@ -56,6 +59,7 @@ const AppContent: React.FC = () => {
       id: Date.now().toString(),
       name,
       email,
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
       role: 'member',
       createdAt: new Date(),
     };
@@ -86,7 +90,7 @@ const AppContent: React.FC = () => {
       progress: 0,
       startDate: projectData.startDate,
       endDate: projectData.endDate,
-      team: [mockUsers[0]], // Current user
+      team: user ? [user] : [],
       tasks: [],
       color: projectData.color,
     };
@@ -102,8 +106,8 @@ const AppContent: React.FC = () => {
     dueDate?: Date;
     projectId: string;
   }) => {
-    const assignee = taskData.assigneeId 
-      ? mockUsers.find(u => u.id === taskData.assigneeId)
+    const assignee = taskData.assigneeId
+      ? users.find((u: any) => u.id === taskData.assigneeId)
       : undefined;
 
     const newTask: Task = {
@@ -132,24 +136,38 @@ const AppContent: React.FC = () => {
     );
   }
 
+  const handleNewEvent = (eventData: {
+    title: string;
+    description: string;
+    date: Date;
+    type: 'deadline' | 'meeting' | 'milestone';
+    projectId?: string;
+  }) => {
+    const newEvent = {
+      id: Date.now().toString(),
+      ...eventData,
+    };
+    setEvents([...events, newEvent]);
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard />;
+        return <Dashboard projects={projects} tasks={tasks} user={user} />;
       case 'projects':
-        return <ProjectsView />;
+        return <ProjectsView projects={projects} onNewProject={() => setShowNewProjectModal(true)} />;
       case 'tasks':
-        return <TasksView />;
+        return <TasksView tasks={tasks} onNewTask={() => setShowNewTaskModal(true)} users={users} />;
       case 'team':
-        return <TeamView onBack={() => setActiveTab('dashboard')} />;
+        return <TeamView onBack={() => setActiveTab('dashboard')} users={users} />;
       case 'calendar':
-        return <CalendarView onBack={() => setActiveTab('dashboard')} />;
+        return <CalendarView onBack={() => setActiveTab('dashboard')} events={events} onNewEvent={() => setShowNewEventModal(true)} projects={projects} />;
       case 'analytics':
-        return <AnalyticsView onBack={() => setActiveTab('dashboard')} />;
+        return <AnalyticsView onBack={() => setActiveTab('dashboard')} projects={projects} tasks={tasks} users={users} />;
       case 'settings':
-        return <SettingsView onBack={() => setActiveTab('dashboard')} />;
+        return <SettingsView onBack={() => setActiveTab('dashboard')} user={user} setUser={setUser} />;
       default:
-        return <Dashboard />;
+        return <Dashboard projects={projects} tasks={tasks} user={user} />;
     }
   };
 
@@ -158,7 +176,8 @@ const AppContent: React.FC = () => {
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header 
+        <Header
+          user={user}
           onNewProject={() => setShowNewProjectModal(true)}
           onNewTask={() => setShowNewTaskModal(true)}
           onLogout={logout}
@@ -190,6 +209,15 @@ const AppContent: React.FC = () => {
         isOpen={showNewTaskModal}
         onClose={() => setShowNewTaskModal(false)}
         onSubmit={handleNewTask}
+        projects={projects}
+        users={users}
+      />
+
+      <NewEventModal
+        isOpen={showNewEventModal}
+        onClose={() => setShowNewEventModal(false)}
+        onSubmit={handleNewEvent}
+        projects={projects}
       />
     </div>
   );

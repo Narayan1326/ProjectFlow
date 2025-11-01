@@ -9,38 +9,14 @@ import { CalendarEvent } from '../../types';
 
 interface CalendarViewProps {
   onBack: () => void;
+  events: any[];
+  onNewEvent: () => void;
+  projects: any[];
 }
 
-const CalendarView: React.FC<CalendarViewProps> = ({ onBack }) => {
+const CalendarView: React.FC<CalendarViewProps> = ({ onBack, events, onNewEvent, projects }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<'month' | 'week'>('month');
-
-  // Mock calendar events
-  const events: CalendarEvent[] = [
-    {
-      id: '1',
-      title: 'Project Deadline',
-      description: 'ProjectFlow Platform completion',
-      date: new Date(2024, 1, 15),
-      type: 'deadline',
-      projectId: '1',
-    },
-    {
-      id: '2',
-      title: 'Team Meeting',
-      description: 'Weekly standup meeting',
-      date: new Date(2024, 1, 12),
-      type: 'meeting',
-    },
-    {
-      id: '3',
-      title: 'Milestone Review',
-      description: 'Q1 milestone review',
-      date: new Date(2024, 1, 20),
-      type: 'milestone',
-      projectId: '2',
-    },
-  ];
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -109,7 +85,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ onBack }) => {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Calendar</h1>
           <p className="text-gray-600 dark:text-gray-400">View project deadlines and milestones</p>
         </div>
-        <Button icon={Plus} size="md">
+        <Button icon={Plus} size="md" onClick={onNewEvent}>
           New Event
         </Button>
       </div>

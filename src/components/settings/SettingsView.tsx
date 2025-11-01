@@ -9,9 +9,11 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 
 interface SettingsViewProps {
   onBack: () => void;
+  user: any;
+  setUser: (user: any) => void;
 }
 
-const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
+const SettingsView: React.FC<SettingsViewProps> = ({ onBack, user, setUser }) => {
   const [settings, setSettings] = useLocalStorage('app_settings', {
     notifications: {
       email: true,
@@ -29,15 +31,15 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
   });
 
   const [profile, setProfile] = useState({
-    name: 'Sarah Chen',
-    email: 'sarah@projectflow.com',
-    bio: 'Product Manager at ProjectFlow',
-    avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2',
+    name: user?.name || '',
+    email: user?.email || '',
+    bio: user?.bio || '',
+    avatar: user?.avatar || '',
   });
 
   const handleSaveSettings = () => {
     setSettings(settings);
-    // Show success message
+    setUser({ ...user, ...profile });
     alert('Settings saved successfully!');
   };
 
@@ -112,7 +114,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
         >
           <div className="space-y-4">
             <div className="flex items-center space-x-4">
-              <Avatar src={profile.avatar} alt={profile.name} size="xl" />
+              <Avatar src={user?.avatar} alt={user?.name} size="xl" />
               <div className="flex-1">
                 <Button variant="secondary" size="sm">
                   Change Avatar
